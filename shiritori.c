@@ -17,10 +17,32 @@ int is_hiragana_only(const char *word, size_t len) {
     return 1;
 }
 
+int is_in_dictionary(const char *word){
+    FILE *fp = fopen("dictionary.txt", "r");
+    if(fp==NULL){
+        return 1;
+    }
+    char line[MAX_WORD_LENGTH];
+    int found=0;
+    while(fgets(line, sizeof(line), fp)!=NULL){
+        size_t len = strlen(line);
+        if(len > 0 && line[len - 1] == '\n'){
+            line[len - 1] = '\0';
+        } 
+        if(strcmp(word,line)==0){
+            found = 1;
+            fclose(fp);
+            return found;
+        }   
+    }
+    fclose(fp);
+    return found;
+}
+
 int main(void){
     char next_word[MAX_WORD_LENGTH];
     char history[MAX_HISTORY][MAX_WORD_LENGTH];
-    int history_count=0;
+    int history_count = 0;
     const char *start_chars[] = {
     "あ", "い", "う", "え", "お",
     "か", "き", "く", "け", "こ",
@@ -74,6 +96,11 @@ int main(void){
             continue;
         }
         
+        if(is_in_dictionary(next_word)==0){
+            printf("エラー: 辞書に存在しない単語です\n\n");
+            continue;
+        }
+
         if (strncmp(history[history_count-1] + prev_len - 3, next_word, 3) == 0) {
             if ((unsigned char)next_word[len - 3] == 0xE3 &&(unsigned char)next_word[len - 2] == 0x82 &&(unsigned char)next_word[len - 1] == 0x93) {
                 printf("\n「%s」は「ん」で終わるため、ゲーム終了です！\n", next_word);
