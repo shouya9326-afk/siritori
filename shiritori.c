@@ -22,7 +22,7 @@ int is_hiragana_only(const char *word, size_t len) {
 int is_in_dictionary(const char *word){
     FILE *fp = fopen("dictionary.txt", "r");
     if(fp==NULL){
-        return 1;
+        return 0;
     }
     char line[MAX_WORD_LENGTH];
     int found=0;
@@ -153,6 +153,11 @@ int main(void){
                 printf("スコア：%i\n", score);
                 break;
             }
+            if (history_count >= MAX_HISTORY) {
+                printf("履歴の上限に達しました。ゲーム終了です。\n");
+                printf("スコア：%d\n", score);
+                break;
+            }
             strcpy(history[history_count], next_word);
             history_count++;
             score+=(int)(len/3);
@@ -180,6 +185,11 @@ int main(void){
             if (cpu_duplicated) {
                 printf("\n「%s」は既に使われた単語です。ゲーム終了です！あなたの勝ちです！\n", cpu);
                 printf("スコア：%i\n", score);
+                break;
+            }
+            if (history_count >= MAX_HISTORY) {
+                printf("履歴の上限に達しました。ゲーム終了です。\n");
+                printf("スコア：%d\n", score);
                 break;
             }
             strcpy(history[history_count], cpu);
